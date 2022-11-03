@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 #include <vector>
+#include <string>
+
 #include "IDrawable.h"
 #include "IOverlappable.h"
 
@@ -10,6 +12,7 @@ class Game {
  private:
     SDL_Window* window = NULL;
     SDL_Surface* surface = NULL;
+    SDL_Surface* bg_surface = NULL;
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
     std::vector<IOverlappable*> nonPhysicals;
@@ -27,8 +30,8 @@ class Game {
     void close();
 
 public:
-    const int SCREEN_HEIGHT = 500;
-    const int SCREEN_WIDTH = 500;
+    const int SCREEN_HEIGHT = 640;
+    const int SCREEN_WIDTH = 960;
 
     void start();
 };

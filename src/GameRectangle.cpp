@@ -3,13 +3,32 @@
 #include "../include/GameRectangle.h"
 #include <iostream>
 
-void GameRectangle::draw(SDL_Surface* surface) const {
+GameRectangle::~GameRectangle() {
+    if (img_surface != NULL) {
+        SDL_FreeSurface(img_surface);
+        img_surface = NULL;
+    }
+}
+
+void GameRectangle::draw(SDL_Surface* surface) {
+
     SDL_Rect r;
     r.w = width;
     r.h = height;
     r.x = xPos;
     r.y = yPos;
-    SDL_FillRect(surface, &r, SDL_MapRGB(surface->format, red, green, blue));
+
+    if (sprites.size() < 1) {
+        SDL_FillRect(surface, &r, SDL_MapRGB(surface->format, red, green, blue));
+    }
+    else {
+        if (drawCounter >= 3) {
+            drawCounter = 0;
+            currentFrame = (currentFrame +1) % sprites.size();
+        }
+        SDL_BlitSurface(sprites[currentFrame], NULL, surface, &r);
+    }
+    ++drawCounter;
 }
 
 bool GameRectangle::isValidMove() const {
@@ -27,6 +46,13 @@ bool GameRectangle::isValidMove() const {
     return true;
 }
 
+void GameRectangle::setWidth(int n) {
+    width = n;
+}
+
+void GameRectangle::setHeight(int n) {
+    height = n;
+}
 
 void GameRectangle::moveX(const int amt) {
     xPos += amt;
@@ -54,6 +80,19 @@ void GameRectangle::setColour(const int r, const int g, const int b) {
     red = r;
     green = g;
     blue = b;
+}
+
+void GameRectangle::loadImage(const std::string& img) {
+    sprites.clear();
+    // TODO: Add checks to ensure this loads properly and handle it of it doesn't
+    sprites.push_back(SDL_LoadBMP(img.c_str()));
+}
+
+void GameRectangle::loadSpriteFiles(const std::vector<std::string>& files) {
+    sprites.clear();
+    for (std::string file : files) {
+        sprites.push_back(SDL_LoadBMP(file.c_str()));
+    }
 }
 
 void GameRectangle::setPhysicalsList(std::vector<IOverlappable*>* list) {
