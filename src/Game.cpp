@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <vector>
 #include <iostream>
@@ -13,21 +14,9 @@
 #include "../include/IDrawable.h"
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
+#include "Obstacle.h"
 #include "Player.h"
 #include "Person.h"
-
-template <typename T>
-void Game::eraseFromVector(std::vector<T>& vec, T elem) {
-    auto i = vec.begin();
-    for (; i != vec.end(); ++i) {
-        if (*i == elem) {
-            break;
-        }
-    }
-    if (i != vec.end()) {
-        vec.erase(i);
-    }
-}
 
 void Game::start() {
   init();
@@ -38,6 +27,7 @@ void Game::start() {
 void Game::init() {
     //  These should be in if statements (possibly nested)
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    TTF_Init();
     window = SDL_CreateWindow("Boxes",SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_SHOWN);
     surface = SDL_GetWindowSurface(window);
@@ -49,6 +39,9 @@ void Game::init() {
     destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
 }
 
+// TODO: For text - Move to header file
+SDL_Rect tr;
+SDL_Surface* tSurf;
 void Game::draw() {
   SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 125, 125, 125));
 
@@ -57,10 +50,30 @@ void Game::draw() {
   for (auto d : drawables) {
     d->draw(surface);
   }
+  SDL_BlitSurface(tSurf, NULL, surface, NULL);
   SDL_UpdateWindowSurface (window);
 }
 
 void Game::run() {
+    // Text stuff (practice)
+    tr.w = 200;
+    tr.h = 80;
+    tr.x = SCREEN_WIDTH - tr.w;
+    tr.y = 0;
+    TTF_Font* font = TTF_OpenFont("assets/Connection II-1260.ttf", 48);
+    SDL_Color Black = {0, 0, 0};
+    tSurf = TTF_RenderText_Solid(font, "Hello", Black);
+    // Text stuff ends above here
+
+    GameRectangle* endBox = new GameRectangle();
+    int ebHeight = 5;
+    endBox->setWidth(SCREEN_WIDTH);
+    endBox->setHeight(ebHeight);
+    endBox->setX(0);
+    endBox->setY(SCREEN_HEIGHT - ebHeight);
+    nonPhysicals.push_back(static_cast<IOverlappable*>(endBox));
+    int score =0;
+    endBox->addOverlapFunc([&score](GameRectangle* endBox){++score; std::cout << "Score is: " << score << std::endl;});
   Player *player = new Player();
   GameRectangle *r2 = new GameRectangle();
   Person *people[10];
@@ -79,6 +92,7 @@ void Game::run() {
             "assets/person/person-small-2.bmp" });
     drawables.push_back(static_cast<IDrawable*>(people[i]));
     physicals.push_back(static_cast<IOverlappable*>(people[i]));
+    nonPhysicals.push_back(static_cast<IOverlappable*>(people[i]));
   }
   player->setWidth(27);
   player->setHeight(30);
@@ -86,26 +100,23 @@ void Game::run() {
   player->loadSpriteFiles( { "assets/person/person-small-0.bmp",
       "assets/person/person-small-1.bmp", "assets/person/person-small-2.bmp" });
 
-  r2->setX(100);
-  r2->setY(100);
-
-  r2->setWidth(81);
-  r2->setHeight(46);
-  r2->loadSpriteFiles( { "assets/block/block-small-0.bmp",
-      "assets/block/block-small-1.bmp", });
-
   drawables.push_back(static_cast<IDrawable*>(player));
-  drawables.push_back(static_cast<IDrawable*>(r2));
 
   physicals.push_back(static_cast<IOverlappable*>(player));
-  physicals.push_back(static_cast<IOverlappable*>(r2));
 
   nonPhysicals.push_back(static_cast<IOverlappable*>(player));
 
   player->setPhysicalsList(&physicals);
-  //r2->setPhysicalsList(&physicals);
 
-  player->setNonPhysicalsList(&nonPhysicals);
+  Obstacle* o = new Obstacle(&physicals, &nonPhysicals);
+  o->setX(200);
+  o->setY(200);
+  o->addFunc([](GameRectangle* gr){
+    // TODO: Remove inner and out blocks (and the whole object from lists)
+  });
+  drawables.push_back(static_cast<IDrawable*>(o));
+
+  //player->setNonPhysicalsList(&nonPhysicals);
 
   for (int i = 0; i < 10; i++) {
     people[i]->setPhysicalsList(&physicals);

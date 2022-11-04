@@ -17,9 +17,6 @@ class Game {
     Mix_Music* mainTheme;
     Mix_Chunk* destroyBlock;
 
-    template <typename T>
-    void eraseFromVector(std::vector<T>& vec, T elem);
-
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
     std::vector<IOverlappable*> nonPhysicals;
