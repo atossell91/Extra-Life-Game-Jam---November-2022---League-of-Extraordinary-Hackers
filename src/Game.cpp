@@ -17,6 +17,7 @@
 #include "../include/GameRectangle.h"
 #include "../include/VecRemover.h"
 #include "../include/TextBox.h"
+#include "../include/Person.h"
 #include "Obstacle.h"
 #include "Player.h"
 #include "Person.h"
@@ -93,9 +94,9 @@ void Game::run() {
   int tempH = 100;
   int tempW = 100;
   for (int i = 0; i < 10; i++) {
-    people[i] = new Person;
-    people[i]->setX(tempW);
-    people[i]->setY(tempH);
+    people[i] = new Person(tempW, tempH);
+    //people[i]->setX(tempW);
+    //people[i]->setY(tempH);
     people[i]->setWidth(27);
     people[i]->setHeight(30);
     tempW += 50;

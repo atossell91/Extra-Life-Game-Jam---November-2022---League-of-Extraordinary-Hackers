@@ -19,7 +19,7 @@ void timer()
         seconds--;
         }
     }
-int main()
+int MagicMain()
 {
     timer();
     return 0;
