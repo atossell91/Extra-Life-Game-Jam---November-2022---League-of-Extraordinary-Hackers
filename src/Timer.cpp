@@ -1,26 +1,31 @@
-#include <iomanip>
+//  Copyright 2022
+#include "../include/Timer.h"
+
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
+#include <thread>
+#include <chrono>
+#include <functional>
 
-using namespace std;
-
-int seconds = 60;
-
-void displayClock()
-{
-    cout <<seconds;
+Timer::Timer(std::function<void ()> callback) {
+    this->callback = callback;
 }
-void timer()
+
+void Timer::start() {
+    t = new std::thread([this](){tick();});
+}
+
+void Timer::stop() {
+    shouldStop = true;
+    t->join();
+}
+
+void Timer::tick()
 {
-    while (true) {
-        displayClock();
-        sleep(1);
-        seconds--;
-        }
+    while (!shouldStop) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(TICK_LENGTH));
+        callback();
     }
-int MagicMain()
-{
-    timer();
-    return 0;
 }
+
