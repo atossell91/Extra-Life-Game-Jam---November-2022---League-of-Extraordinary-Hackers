@@ -10,11 +10,13 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <sstream>
 
 #include "../include/IDrawable.h"
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
 #include "../include/VecRemover.h"
+#include "../include/TextBox.h"
 #include "Obstacle.h"
 #include "Player.h"
 #include "Person.h"
@@ -25,6 +27,12 @@ void Game::start() {
   close();
 }
 
+void Game::updateScore(int s) {
+  std::stringstream ss;
+  ss << s;
+  scoreTb.setText(ss.str());
+}
+
 void Game::init() {
     //  These should be in if statements (possibly nested)
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -32,6 +40,8 @@ void Game::init() {
     window = SDL_CreateWindow("Boxes",SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_SHOWN);
     surface = SDL_GetWindowSurface(window);
+    gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
     bg_surface = SDL_LoadBMP("assets/map/map.bmp");
 
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT,
@@ -39,11 +49,18 @@ void Game::init() {
     mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
     destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
     freedomSound = Mix_LoadWAV("assets/sounds/People End.wav");
+    
+    drawables.push_back(static_cast<IDrawable*>(&scoreTb));
+    std::stringstream ss;
+    ss << score;
+    scoreTb.setText(ss.str());
+    scoreTb.setWidth(SCORE_TB_WIDTH);
+    scoreTb.setHeight(SCORE_TB_HEIGHT);
+    scoreTb.setPosX(SCORE_TB_XLOC);
+    scoreTb.setPosY(SCORE_TB_YLOC);
 }
 
 // TODO: For text - Move to header file
-SDL_Rect tr;
-SDL_Surface* tSurf;
 void Game::draw() {
   SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 125, 125, 125));
 
@@ -52,20 +69,10 @@ void Game::draw() {
   for (auto d : drawables) {
     d->draw(surface);
   }
-  SDL_BlitSurface(tSurf, NULL, surface, NULL);
   SDL_UpdateWindowSurface (window);
 }
 
 void Game::run() {
-    // Text stuff (practice)
-    tr.w = 200;
-    tr.h = 80;
-    tr.x = SCREEN_WIDTH - tr.w;
-    tr.y = 0;
-    TTF_Font* font = TTF_OpenFont("assets/Connection II-1260.ttf", 48);
-    SDL_Color Black = {0, 0, 0};
-    tSurf = TTF_RenderText_Solid(font, "Hello", Black);
-    // Text stuff ends above here
 
     GameRectangle* endBox = new GameRectangle();
     int ebHeight = 5;
@@ -77,7 +84,7 @@ void Game::run() {
     int score =0;
     endBox->addOverlapFunc([&score, this](GameRectangle* endBox)
     {
-      ++score; std::cout << "Score is: " << score << std::endl;
+      this->updateScore(++score);
       Mix_PlayChannel(-1, this->freedomSound, 0);
     });
   Player *player = new Player();
