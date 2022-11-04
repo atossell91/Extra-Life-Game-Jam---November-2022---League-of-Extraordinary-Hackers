@@ -2,7 +2,7 @@
 #define INCLUDE_VISIBLE_H_
 
 #include <vector>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <string>
 
 #include "IDrawable.h"

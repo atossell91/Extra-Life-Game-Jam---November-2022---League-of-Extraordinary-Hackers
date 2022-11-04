@@ -1,8 +1,8 @@
 #include "../include/Game.h"
 
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <vector>
 #include <iostream>
@@ -106,9 +106,6 @@ void Game::run() {
                 if (state[SDL_SCANCODE_RIGHT]) {
                     r1->moveX(amt);
                 }
-            }
-            if (e.type == GameRectangle::OverlapEvent->type()) {
-                std::cout << "An Overlap ocurred" << std::endl;
             }
         }
         draw();

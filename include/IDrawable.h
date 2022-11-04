@@ -1,7 +1,7 @@
 #ifndef INCLUDE_IDRAWABLE_H_
 #define INCLUDE_IDRAWABLE_H_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 class IDrawable {
  public:
