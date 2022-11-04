@@ -20,6 +20,7 @@ class Game {
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
     std::vector<IOverlappable*> nonPhysicals;
+    std::vector<IOverlappable*> playerNonPhysicals;
 
     enum EnumLayers {Bottom, Middle, Top};
     const EnumLayers TopLayer = EnumLayers::Top;

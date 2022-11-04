@@ -14,12 +14,16 @@ class Obstacle : public IDrawable {
     const int MARGIN = 3;
     GameRectangle* block;
     GameRectangle* area;
+
+    std::vector<IOverlappable*>* physicals;
+    std::vector<IOverlappable*>* nonPhysicals;
  public:
     void setX(int x);
     void setY(int Y);
     void addFunc(std::function<void (GameRectangle*)> func);
     Obstacle(std::vector<IOverlappable*>* phys,
     std::vector<IOverlappable*>* nonPhys);
+    void removeAll();
 
     void draw(SDL_Surface* surface);
 };

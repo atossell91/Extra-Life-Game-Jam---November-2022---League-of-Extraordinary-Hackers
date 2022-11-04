@@ -1,5 +1,6 @@
 //  Copyright 2022 Anthony Tossell
 #include "../include/Obstacle.h"
+#include "../include/VecRemover.h"
 
 #include <SDL2/SDL.h>
 
@@ -13,6 +14,7 @@ std::vector<IOverlappable*>* nonPhys) {
       "assets/block/block-small-1.bmp"
     });
     if (phys != NULL) {
+        physicals = phys;
         phys->push_back(static_cast<IOverlappable*>(block));
     }
 
@@ -20,12 +22,18 @@ std::vector<IOverlappable*>* nonPhys) {
     area->setWidth(BLOCK_WIDTH + MARGIN*2);
     area->setHeight(BLOCK_HEIGHT + MARGIN*2);
     if (nonPhys != NULL) {
+        nonPhysicals = nonPhys;
         nonPhys->push_back(static_cast<IOverlappable*>(area));
     }
 }
 
 void Obstacle::draw(SDL_Surface* surface) {
     block->draw(surface);
+}
+
+void Obstacle::removeAll() {
+    VecRemover::remove(*nonPhysicals, static_cast<IOverlappable*>(area));
+    VecRemover::remove(*physicals, static_cast<IOverlappable*>(block));
 }
 
 void Obstacle::setX(int x) {

@@ -14,6 +14,7 @@
 #include "../include/IDrawable.h"
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
+#include "../include/VecRemover.h"
 #include "Obstacle.h"
 #include "Player.h"
 #include "Person.h"
@@ -104,15 +105,17 @@ void Game::run() {
 
   physicals.push_back(static_cast<IOverlappable*>(player));
 
-  nonPhysicals.push_back(static_cast<IOverlappable*>(player));
+  playerNonPhysicals.push_back(static_cast<IOverlappable*>(player));
 
   player->setPhysicalsList(&physicals);
+  player->setNonPhysicalsList(&playerNonPhysicals);
 
-  Obstacle* o = new Obstacle(&physicals, &nonPhysicals);
+  Obstacle* o = new Obstacle(&physicals, &playerNonPhysicals);
   o->setX(200);
   o->setY(200);
-  o->addFunc([](GameRectangle* gr){
-    // TODO: Remove inner and out blocks (and the whole object from lists)
+  o->addFunc([&o, this](GameRectangle* gr){
+    o->removeAll();
+    VecRemover::remove(drawables, static_cast<IDrawable*>(o));
   });
   drawables.push_back(static_cast<IDrawable*>(o));
 
