@@ -45,16 +45,13 @@ class GameRectangle : public IDrawable, public IOverlappable,
     int height = 50;
     int xPos = 0;
     int yPos = 0;
-      
-   std::vector<IOverlappable*>* physicals = NULL;
-   std::vector<IOverlappable*>* nonPhysicals = NULL;
-   std::vector<std::function<void (GameRectangle*)>> overlapFuncs;\
      
   int currentFrame = 0;
-  int drawCounter = 0;\
+  int drawCounter = 0;
 
   std::vector<IOverlappable*> *physicals = NULL;
   std::vector<IOverlappable*> *nonPhysicals = NULL;
+   std::vector<std::function<void (GameRectangle*)>> overlapFuncs;
 
   SDL_Surface *img_surface = NULL;
   std::vector<SDL_Surface*> sprites;
