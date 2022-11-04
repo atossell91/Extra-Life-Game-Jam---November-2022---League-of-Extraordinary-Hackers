@@ -13,7 +13,7 @@
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
 #include "Player.h"
-
+#include "Person.h"
 void Game::start() {
   init();
   run();
@@ -44,7 +44,23 @@ void Game::draw() {
 void Game::run() {
   Player *player = new Player();
   GameRectangle *r2 = new GameRectangle();
-
+  Person *people[10];
+  int tempH = 100;
+  int tempW = 100;
+  for (int i = 0; i < 10; i++) {
+    people[i] = new Person;
+    people[i]->setX(tempW);
+    people[i]->setY(tempH);
+    people[i]->setWidth(27);
+    people[i]->setHeight(30);
+    tempW += 50;
+    people[i]->loadSpriteFiles(
+        { "assets/person/person-small-0.bmp",
+            "assets/person/person-small-1.bmp",
+            "assets/person/person-small-2.bmp" });
+    drawables.push_back(static_cast<IDrawable*>(people[i]));
+    physicals.push_back(static_cast<IOverlappable*>(people[i]));
+  }
   player->setWidth(27);
   player->setHeight(30);
 
@@ -72,6 +88,10 @@ void Game::run() {
 
   player->setNonPhysicalsList(&nonPhysicals);
 
+  for (int i = 0; i < 10; i++) {
+    people[i]->setPhysicalsList(&physicals);
+    people[i]->setNonPhysicalsList(&nonPhysicals);
+  }
   SDL_Event e;
   bool quit = false;
   while (!quit) {
@@ -86,6 +106,10 @@ void Game::run() {
         const Uint8 *state = SDL_GetKeyboardState(NULL);
         player->travel(state);
       }
+    }
+    //Update NPCS
+    for (int i = 0; i < 10; i++) {
+      people[i]->travel();
     }
     draw();
     std::this_thread::sleep_for(std::chrono::milliseconds(17));

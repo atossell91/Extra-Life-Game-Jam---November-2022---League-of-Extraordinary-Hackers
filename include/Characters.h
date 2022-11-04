@@ -14,7 +14,7 @@ class Characters : public GameRectangle {
   virtual void travel() = 0;
   void setSpeed(unsigned int spd);
  protected:
-  unsigned int speed = 10;
+  unsigned int speed = 1;
 };
 
 #endif /* INCLUDE_CHARACTERS_H_ */
