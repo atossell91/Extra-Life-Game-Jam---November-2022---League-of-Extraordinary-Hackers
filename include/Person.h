@@ -11,8 +11,14 @@
 
 class Person : public Characters {
  public:
+  Person(int x, int y);
   void travel();
-
+  void respawn();
+ private:
+  int score = 0;
+  const int spawnx;
+  const int spawny;
+  int spawntimer = 0;
 };
 
 #endif /* INCLUDE_PERSON_H_ */
