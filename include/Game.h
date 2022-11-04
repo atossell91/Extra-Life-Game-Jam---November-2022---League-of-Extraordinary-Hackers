@@ -10,6 +10,7 @@
 #include "IOverlappable.h"
 #include "TextBox.h"
 #include "RandomNumGenerator.h"
+#include "ObstacleSpawner.h"
 
 class Game {
  private:
@@ -24,6 +25,7 @@ class Game {
     Mix_Music* mainTheme;
     Mix_Chunk* destroyBlock;
     Mix_Chunk* freedomSound;
+    Mix_Chunk* blockCreateSound;
 
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
