@@ -7,6 +7,7 @@
 
 #ifndef INCLUDE_CHARACTERS_H_
 #define INCLUDE_CHARACTERS_H_
+#include <thread>
 #include "GameRectangle.h"
 
 class Characters : public GameRectangle {
