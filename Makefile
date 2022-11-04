@@ -6,6 +6,8 @@ CXXFLAGS = -std=c++17
 SRC = src
 INCLUDE = -Iinclude
 
+STATIC = -static libgcc -static libsdl2-image-dev -static libsdl2-dev -static libsdl2-ttf-dev
+
 ## SDL Stuff ##
 SDL_INCLUDE = -ISDL/include/SDL2
 #  Left out, because they don't seem to be necessary (also they point to the
@@ -26,7 +28,9 @@ SDL = $(SDL_INCLUDE) $(SDL_FLAGS) $(SDL_ARCHIVE)
 .DEFUALT_GOAL := $(PROJ)
 
 $(PROJECT_NAME): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC)/*.cpp -o $@ $(INCLUDE) $(SDL)
+	$(CXX) $(CXXFLAGS) $(SRC)/*.cpp -o $@ $(INCLUDE) $(SDL) $(STATIC)
+
+
 
 clean:
 	rm -f *.exe *.o src/*.o
