@@ -28,7 +28,7 @@ SDL = $(SDL_INCLUDE) $(SDL_FLAGS) $(SDL_ARCHIVE)
 .DEFUALT_GOAL := $(PROJ)
 
 $(PROJECT_NAME): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC)/*.cpp -o $@ $(INCLUDE) $(SDL) $(STATIC)
+	$(CXX) $(CXXFLAGS) $(SRC)/*.cpp -o $@ $(INCLUDE) $(SDL)
 
 
 

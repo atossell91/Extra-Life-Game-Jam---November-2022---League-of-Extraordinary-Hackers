@@ -4,6 +4,7 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include <string>
+#include <functional>
 
 #include "IDrawable.h"
 #include "IOverlappable.h"
@@ -34,6 +35,10 @@ class GameRectangle : public IDrawable, public IOverlappable, public IPlayerMove
     
     void setPhysicalsList(std::vector<IOverlappable*>* list);
     void setNonPhysicalsList(std::vector<IOverlappable*>* list);
+
+    void addOverlapFunc(std::function<void (GameRectangle*)> foo);
+    void callOverlapFuncs();
+    std::vector<IOverlappable*> findOverlaps();
  private:
     int width = 50;
     int height = 50;
@@ -45,6 +50,7 @@ class GameRectangle : public IDrawable, public IOverlappable, public IPlayerMove
 
    std::vector<IOverlappable*>* physicals = NULL;
    std::vector<IOverlappable*>* nonPhysicals = NULL;
+   std::vector<std::function<void (GameRectangle*)>> overlapFuncs;
 
    SDL_Surface* img_surface = NULL;
    std::vector<SDL_Surface*> sprites;

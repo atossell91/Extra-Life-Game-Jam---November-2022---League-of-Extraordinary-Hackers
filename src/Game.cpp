@@ -14,6 +14,19 @@
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
 
+template <typename T>
+void Game::eraseFromVector(std::vector<T>& vec, T elem) {
+    auto i = vec.begin();
+    for (; i != vec.end(); ++i) {
+        if (*i == elem) {
+            break;
+        }
+    }
+    if (i != vec.end()) {
+        vec.erase(i);
+    }
+}
+
 void Game::start() {
     init();
     run();
@@ -31,6 +44,7 @@ void Game::init() {
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT,
     AUDIO_CHANNELS, AUDIO_CHUNK_SIZE);
     mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
+    destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
 }
 
 void Game::draw() {
@@ -45,40 +59,72 @@ void Game::draw() {
 }
 
 void Game::run() {
-    GameRectangle* r1 = new GameRectangle();
-    GameRectangle* r2 = new GameRectangle();
 
-    r1->setWidth(27);
-    r1->setHeight(30);
-    
-    r1->loadSpriteFiles({
+    GameRectangle* playerObject = new GameRectangle();
+    playerObject->setWidth(27);
+    playerObject->setHeight(30);
+    playerObject->loadSpriteFiles({
         "assets/person/person-small-0.bmp",
         "assets/person/person-small-1.bmp",
         "assets/person/person-small-2.bmp"
     });
+    drawables.push_back(static_cast<IDrawable*>(playerObject));
+    physicals.push_back(static_cast<IOverlappable*>(playerObject));
+    nonPhysicals.push_back(static_cast<IOverlappable*>(playerObject));
+    playerObject->setPhysicalsList(&physicals);
+    //r2->setPhysicalsList(&physicals);
+    playerObject->setNonPhysicalsList(&nonPhysicals);
 
-    r2->setX(100);
-    r2->setY(100);
+    //  TODO: Handle the leaking memory
+    GameRectangle* bottomBox = new GameRectangle();
+    int bottomBoxHeight = 20;
+    bottomBox->setWidth(SCREEN_WIDTH);
+    bottomBox->setHeight(bottomBoxHeight);
+    bottomBox->setX(0);
+    bottomBox->setY(SCREEN_HEIGHT - bottomBoxHeight);
+    //TODO: Change this
+    //bottomBox->addOverlapFunc([this](GameRectangle* r){std::cout << "An overlap has occured" << std::endl;});
+    //drawables.push_back(static_cast<IDrawable*>(r3)); // Comment out to hide
+    nonPhysicals.push_back(static_cast<IOverlappable*>(bottomBox));
 
-    r2->setWidth(81);
-    r2->setHeight(46);
-    r2->loadSpriteFiles({
+    GameRectangle* blockObject1 = new GameRectangle();
+    blockObject1->setX(100);
+    blockObject1->setY(100);
+    blockObject1->setWidth(81);
+    blockObject1->setHeight(46);
+    blockObject1->loadSpriteFiles({
         "assets/block/block-small-0.bmp",
         "assets/block/block-small-1.bmp",
     });
+    drawables.push_back(static_cast<IDrawable*>(blockObject1));
+    physicals.push_back(static_cast<IOverlappable*>(blockObject1));
 
-    drawables.push_back(static_cast<IDrawable*>(r1));
-    drawables.push_back(static_cast<IDrawable*>(r2));
-
-    physicals.push_back(static_cast<IOverlappable*>(r1));
-    physicals.push_back(static_cast<IOverlappable*>(r2));
-
-    nonPhysicals.push_back(static_cast<IOverlappable*>(r1));
-
-    r1->setPhysicalsList(&physicals);
-    //r2->setPhysicalsList(&physicals);
-
-    r1->setNonPhysicalsList(&nonPhysicals);
+    GameRectangle* qa = new GameRectangle();
+    int margin = 20;
+    qa->setWidth(81 + margin*2);
+    qa->setHeight(46 + margin*2);
+    qa->setX(250 - margin);
+    qa->setY(250 - margin);
+    nonPhysicals.push_back(static_cast<IOverlappable*>(qa));
+    drawables.push_back(static_cast<IDrawable*>(qa));
+    GameRectangle* destroyableBlock = new GameRectangle();
+    destroyableBlock->setWidth(81);
+    destroyableBlock->setHeight(46);
+    destroyableBlock->setX(250);
+    destroyableBlock->setY(250);
+    destroyableBlock->loadSpriteFiles({
+        "assets/block/block-small-0.bmp",
+        "assets/block/block-small-1.bmp",
+    });
+    qa->addOverlapFunc([this, qa, destroyableBlock](GameRectangle* r){
+        eraseFromVector(drawables, static_cast<IDrawable*>(qa));
+        eraseFromVector(nonPhysicals, static_cast<IOverlappable*>(qa));
+        eraseFromVector(drawables, static_cast<IDrawable*>(destroyableBlock));
+        eraseFromVector(physicals, static_cast<IOverlappable*>(destroyableBlock));
+        Mix_PlayChannel(-1, destroyBlock, 0);
+    });
+    drawables.push_back(destroyableBlock);
+    physicals.push_back(destroyableBlock);
 
     Mix_PlayMusic(mainTheme, -1);
 
@@ -95,16 +141,16 @@ void Game::run() {
                 int amt = 10;
                 const Uint8* state = SDL_GetKeyboardState(NULL);
                 if (state[SDL_SCANCODE_UP]) {
-                    r1->moveY(-amt);
+                    playerObject->moveY(-amt);
                 }
                 if (state[SDL_SCANCODE_DOWN]) {
-                    r1->moveY(amt);
+                    playerObject->moveY(amt);
                 }
                 if (state[SDL_SCANCODE_LEFT]) {
-                    r1->moveX(-amt);
+                    playerObject->moveX(-amt);
                 }
                 if (state[SDL_SCANCODE_RIGHT]) {
-                    r1->moveX(amt);
+                    playerObject->moveX(amt);
                 }
             }
         }
