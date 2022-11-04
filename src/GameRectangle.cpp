@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 
+#include <functional>
 #include "../include/GameRectangle.h"
 #include <iostream>
 
@@ -44,6 +45,20 @@ bool GameRectangle::isValidMove() const {
   return true;
 }
 
+std::vector<IOverlappable*> GameRectangle::findOverlaps() {
+    std::vector<IOverlappable*> overlaps;
+    if (nonPhysicals == NULL) {
+        return overlaps;
+    }
+
+    for (auto np : *nonPhysicals) {
+        if (isOverlap(*np, false)) {
+            overlaps.push_back(np);
+        }
+    }
+    return overlaps;
+}
+
 void GameRectangle::setWidth(int n) {
   width = n;
 }
@@ -53,17 +68,23 @@ void GameRectangle::setHeight(int n) {
 }
 
 void GameRectangle::moveX(const int amt) {
-  xPos += amt;
-  if (!isValidMove()) {
-    xPos -= amt;
-  }
+    xPos += amt;
+    if (!isValidMove()) {
+        xPos -= amt;
+    }
+    for (auto overlap : findOverlaps()) {
+        overlap->callOverlapFuncs();
+    }
 }
 
 void GameRectangle::moveY(const int amt) {
-  yPos += amt;
-  if (!isValidMove()) {
-    yPos -= amt;
-  }
+    yPos += amt;
+    if (!isValidMove()) {
+        yPos -= amt;
+    }
+    for (auto overlap : findOverlaps()) {
+        overlap->callOverlapFuncs();
+    }
 }
 
 void GameRectangle::setX(const int val) {
@@ -99,6 +120,16 @@ void GameRectangle::setPhysicalsList(std::vector<IOverlappable*> *list) {
 
 void GameRectangle::setNonPhysicalsList(std::vector<IOverlappable*> *list) {
   this->nonPhysicals = list;
+}
+
+void GameRectangle::addOverlapFunc(std::function<void (GameRectangle*)> foo) {
+    overlapFuncs.push_back(foo);
+}
+
+void GameRectangle::callOverlapFuncs() {
+    for (auto func : overlapFuncs) {
+        func(this);
+    }
 }
 
 // Takes a point (x,y) and checks if it's inside the object

@@ -15,6 +15,20 @@
 #include "../include/GameRectangle.h"
 #include "Player.h"
 #include "Person.h"
+
+template <typename T>
+void Game::eraseFromVector(std::vector<T>& vec, T elem) {
+    auto i = vec.begin();
+    for (; i != vec.end(); ++i) {
+        if (*i == elem) {
+            break;
+        }
+    }
+    if (i != vec.end()) {
+        vec.erase(i);
+    }
+}
+
 void Game::start() {
   init();
   run();
@@ -22,17 +36,17 @@ void Game::start() {
 }
 
 void Game::init() {
-  //  These should be in if statements (possibly nested)
-  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-  window = SDL_CreateWindow("Boxes", SDL_WINDOWPOS_UNDEFINED,
-  SDL_WINDOWPOS_UNDEFINED,
-                            SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-  surface = SDL_GetWindowSurface(window);
-  bg_surface = SDL_LoadBMP("assets/map/map.bmp");
+    //  These should be in if statements (possibly nested)
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    window = SDL_CreateWindow("Boxes",SDL_WINDOWPOS_UNDEFINED,
+    SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_SHOWN);
+    surface = SDL_GetWindowSurface(window);
+    bg_surface = SDL_LoadBMP("assets/map/map.bmp");
 
-  Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, AUDIO_CHANNELS,
-                AUDIO_CHUNK_SIZE);
-  mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT,
+    AUDIO_CHANNELS, AUDIO_CHUNK_SIZE);
+    mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
+    destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
 }
 
 void Game::draw() {
@@ -99,7 +113,7 @@ void Game::run() {
   }
 
   Mix_PlayMusic(mainTheme, -1);
-
+  
   SDL_Event e;
   bool quit = false;
   while (!quit) {
