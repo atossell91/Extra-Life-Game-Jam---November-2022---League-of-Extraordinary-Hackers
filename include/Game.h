@@ -9,6 +9,7 @@
 #include "IDrawable.h"
 #include "IOverlappable.h"
 #include "TextBox.h"
+#include "RandomNumGenerator.h"
 
 class Game {
  private:
@@ -35,6 +36,8 @@ class Game {
     const int SCORE_TB_XLOC = SCREEN_WIDTH - SCORE_TB_WIDTH;
     TextBox scoreTb;
     int score = 0;
+
+    RandomNumGenerator rGen;
 
     enum EnumLayers {Bottom, Middle, Top};
     const EnumLayers TopLayer = EnumLayers::Top;
