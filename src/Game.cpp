@@ -1,114 +1,100 @@
 #include "../include/Game.h"
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <vector>
 #include <iostream>
-#include <Algorithm>
+#include <algorithm>
 #include <thread>
 #include <chrono>
 
 #include "../include/IDrawable.h"
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
+#include "Player.h"
 
 void Game::start() {
-    init();
-    run();
-    close();
+  init();
+  run();
+  close();
 }
 
 void Game::init() {
-    //  These should be in if statements (possibly nested)
-    SDL_Init(SDL_INIT_VIDEO);
-    window = SDL_CreateWindow("Boxes",SDL_WINDOWPOS_UNDEFINED,
-    SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_SHOWN);
-    surface = SDL_GetWindowSurface(window);
-    bg_surface = SDL_LoadBMP("assets/map/map.bmp");
+  //  These should be in if statements (possibly nested)
+  SDL_Init(SDL_INIT_VIDEO);
+  window = SDL_CreateWindow("Boxes", SDL_WINDOWPOS_UNDEFINED,
+  SDL_WINDOWPOS_UNDEFINED,
+                            SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  surface = SDL_GetWindowSurface(window);
+  bg_surface = SDL_LoadBMP("assets/map/map.bmp");
 }
 
 void Game::draw() {
-    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format,125,125,125));
+  SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 125, 125, 125));
 
-    SDL_BlitSurface(bg_surface, NULL, surface, NULL);
+  SDL_BlitSurface(bg_surface, NULL, surface, NULL);
 
-    for (auto d : drawables) {
-        d->draw(surface);
-    }
-    SDL_UpdateWindowSurface(window);
+  for (auto d : drawables) {
+    d->draw(surface);
+  }
+  SDL_UpdateWindowSurface(window);
 }
 
 void Game::run() {
-    GameRectangle* r1 = new GameRectangle();
-    GameRectangle* r2 = new GameRectangle();
+  Player *player = new Player();
+  GameRectangle *r2 = new GameRectangle();
 
-    r1->setWidth(27);
-    r1->setHeight(30);
-    
-    r1->loadSpriteFiles({
-        "assets/person/person-small-0.bmp",
-        "assets/person/person-small-1.bmp",
-        "assets/person/person-small-2.bmp"
-    });
+  player->setWidth(27);
+  player->setHeight(30);
 
-    r2->setX(100);
-    r2->setY(100);
+  player->loadSpriteFiles( { "assets/person/person-small-0.bmp",
+      "assets/person/person-small-1.bmp", "assets/person/person-small-2.bmp" });
 
-    r2->setWidth(81);
-    r2->setHeight(46);
-    r2->loadSpriteFiles({
-        "assets/block/block-small-0.bmp",
-        "assets/block/block-small-1.bmp",
-    });
+  r2->setX(100);
+  r2->setY(100);
 
-    drawables.push_back(static_cast<IDrawable*>(r1));
-    drawables.push_back(static_cast<IDrawable*>(r2));
+  r2->setWidth(81);
+  r2->setHeight(46);
+  r2->loadSpriteFiles( { "assets/block/block-small-0.bmp",
+      "assets/block/block-small-1.bmp", });
 
-    physicals.push_back(static_cast<IOverlappable*>(r1));
-    physicals.push_back(static_cast<IOverlappable*>(r2));
+  drawables.push_back(static_cast<IDrawable*>(player));
+  drawables.push_back(static_cast<IDrawable*>(r2));
 
-    nonPhysicals.push_back(static_cast<IOverlappable*>(r1));
+  physicals.push_back(static_cast<IOverlappable*>(player));
+  physicals.push_back(static_cast<IOverlappable*>(r2));
 
-    r1->setPhysicalsList(&physicals);
-    //r2->setPhysicalsList(&physicals);
+  nonPhysicals.push_back(static_cast<IOverlappable*>(player));
 
-    r1->setNonPhysicalsList(&nonPhysicals);
+  player->setPhysicalsList(&physicals);
+  //r2->setPhysicalsList(&physicals);
 
-    SDL_Event e;
-    bool quit = false;
-    while (!quit) {
+  player->setNonPhysicalsList(&nonPhysicals);
+
+  SDL_Event e;
+  bool quit = false;
+  while (!quit) {
     int count = 0;
-        while (SDL_PollEvent(&e)) {
-            //  Event handlers go in here
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            }
-            if (e.type == SDL_KEYDOWN) {
-                int amt = 10;
-                const Uint8* state = SDL_GetKeyboardState(NULL);
-                if (state[SDL_SCANCODE_UP]) {
-                    r1->moveY(-amt);
-                }
-                if (state[SDL_SCANCODE_DOWN]) {
-                    r1->moveY(amt);
-                }
-                if (state[SDL_SCANCODE_LEFT]) {
-                    r1->moveX(-amt);
-                }
-                if (state[SDL_SCANCODE_RIGHT]) {
-                    r1->moveX(amt);
-                }
-            }
-        }
-        draw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(17));
+    while (SDL_PollEvent(&e)) {
+      //  Event handlers go in here
+      if (e.type == SDL_QUIT) {
+        quit = true;
+      }
+      if (e.type == SDL_KEYDOWN) {
+        int amt = 10;
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        player->travel(state);
+      }
     }
+    draw();
+    std::this_thread::sleep_for(std::chrono::milliseconds(17));
+  }
 }
 
 void Game::close() {
-    SDL_FreeSurface(bg_surface);
-    bg_surface = NULL;
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+  SDL_FreeSurface(bg_surface);
+  bg_surface = NULL;
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 }
