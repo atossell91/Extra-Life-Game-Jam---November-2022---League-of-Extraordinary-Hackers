@@ -42,8 +42,6 @@ void Game::draw() {
 void Game::run() {
     GameRectangle* r1 = new GameRectangle();
     GameRectangle* r2 = new GameRectangle();
-    GameRectangle* r3 = new GameRectangle();
-    GameRectangle* r4 = new GameRectangle();
 
     r1->setWidth(27);
     r1->setHeight(30);
@@ -54,40 +52,28 @@ void Game::run() {
         "assets/person/person-small-2.bmp"
     });
 
-    GameRectangle* a = new GameRectangle();
-    a->setColour(125,125,0);
-    a->setX(250);
-
     r2->setX(100);
     r2->setY(100);
 
-    r3->setX(247);
-    r3->setY(201);
-
-    r4->setColour(0, 0, 255);
-    r4->setX(100);
-    r4->setY(300);
+    r2->setWidth(81);
+    r2->setHeight(46);
+    r2->loadSpriteFiles({
+        "assets/block/block-small-0.bmp",
+        "assets/block/block-small-1.bmp",
+    });
 
     drawables.push_back(static_cast<IDrawable*>(r1));
     drawables.push_back(static_cast<IDrawable*>(r2));
-    drawables.push_back(static_cast<IDrawable*>(r3));
-    drawables.push_back(static_cast<IDrawable*>(r4));
-    drawables.push_back(static_cast<IDrawable*>(a));
 
     physicals.push_back(static_cast<IOverlappable*>(r1));
     physicals.push_back(static_cast<IOverlappable*>(r2));
-    physicals.push_back(static_cast<IOverlappable*>(r3));
-    physicals.push_back(static_cast<IOverlappable*>(a));
 
-    nonPhysicals.push_back(static_cast<IOverlappable*>(r4));
     nonPhysicals.push_back(static_cast<IOverlappable*>(r1));
 
     r1->setPhysicalsList(&physicals);
-    a->setPhysicalsList(&physicals);
     //r2->setPhysicalsList(&physicals);
 
     r1->setNonPhysicalsList(&nonPhysicals);
-    r4->setNonPhysicalsList(&nonPhysicals);
 
     SDL_Event e;
     bool quit = false;
@@ -115,7 +101,6 @@ void Game::run() {
                 }
             }
         }
-        a->moveY(3);
         draw();
         std::this_thread::sleep_for(std::chrono::milliseconds(17));
     }
