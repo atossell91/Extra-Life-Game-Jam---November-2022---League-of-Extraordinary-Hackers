@@ -38,6 +38,7 @@ void Game::init() {
     AUDIO_CHANNELS, AUDIO_CHUNK_SIZE);
     mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
     destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
+    freedomSound = Mix_LoadWAV("assets/sounds/People End.wav");
 }
 
 // TODO: For text - Move to header file
@@ -74,7 +75,11 @@ void Game::run() {
     endBox->setY(SCREEN_HEIGHT - ebHeight);
     nonPhysicals.push_back(static_cast<IOverlappable*>(endBox));
     int score =0;
-    endBox->addOverlapFunc([&score](GameRectangle* endBox){++score; std::cout << "Score is: " << score << std::endl;});
+    endBox->addOverlapFunc([&score, this](GameRectangle* endBox)
+    {
+      ++score; std::cout << "Score is: " << score << std::endl;
+      Mix_PlayChannel(-1, this->freedomSound, 0);
+    });
   Player *player = new Player();
   GameRectangle *r2 = new GameRectangle();
   Person *people[10];
@@ -116,6 +121,7 @@ void Game::run() {
   o->addFunc([&o, this](GameRectangle* gr){
     o->removeAll();
     VecRemover::remove(drawables, static_cast<IDrawable*>(o));
+    Mix_PlayChannel(-1, destroyBlock, 0);
   });
   drawables.push_back(static_cast<IDrawable*>(o));
 

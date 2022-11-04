@@ -14,8 +14,10 @@ class Game {
     SDL_Window* window = NULL;
     SDL_Surface* surface = NULL;
     SDL_Surface* bg_surface = NULL;
+
     Mix_Music* mainTheme;
     Mix_Chunk* destroyBlock;
+    Mix_Chunk* freedomSound;
 
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
