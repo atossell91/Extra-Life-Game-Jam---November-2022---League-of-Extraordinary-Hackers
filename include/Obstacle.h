@@ -6,18 +6,21 @@
 
 #include "GameRectangle.h"
 #include "IDrawable.h"
+#include "IOverlappable.h"
 
-class Obstacle : public IDrawable {
+class Obstacle : public IDrawable, public IOverlappable {
  private:
-    const int BLOCK_WIDTH = 81;
-    const int BLOCK_HEIGHT = 46;
-    const int MARGIN = 3;
+    static const int BLOCK_WIDTH = 81;
+    static const int BLOCK_HEIGHT = 46;
+    static const int MARGIN = 3;
     GameRectangle* block;
     GameRectangle* area;
 
     std::vector<IOverlappable*>* physicals;
     std::vector<IOverlappable*>* nonPhysicals;
  public:
+    static const int WIDTH = BLOCK_WIDTH + MARGIN*2;
+    static const int HEIGHT = BLOCK_HEIGHT + MARGIN*2;
     void setX(int x);
     void setY(int Y);
     void addFunc(std::function<void (GameRectangle*)> func);
@@ -26,6 +29,10 @@ class Obstacle : public IDrawable {
     void removeAll();
 
     void draw(SDL_Surface* surface);
+
+   bool isOverlap(const IOverlappable& other, bool) const;
+   bool isIntersect(const int x, const int y) const;
+   void callOverlapFuncs() {}
 };
 
 #endif  // INCLUDE_OBSTACLE_H_

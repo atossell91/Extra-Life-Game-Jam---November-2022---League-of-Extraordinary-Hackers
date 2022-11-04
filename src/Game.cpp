@@ -50,6 +50,7 @@ void Game::init() {
     mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
     destroyBlock = Mix_LoadWAV("assets/sounds/Destroy.wav");
     freedomSound = Mix_LoadWAV("assets/sounds/People End.wav");
+    blockCreateSound = Mix_LoadWAV("assets/sounds/Barrier Spawn.wav");
     
     drawables.push_back(static_cast<IDrawable*>(&scoreTb));
     std::stringstream ss;
@@ -140,8 +141,11 @@ void Game::run() {
     people[i]->setNonPhysicalsList(&nonPhysicals);
   }
 
+  ObstacleSpawner spawner(&physicals, &nonPhysicals, &drawables);
+
   Mix_PlayMusic(mainTheme, -1);
   
+  unsigned int frameCount =0;
   SDL_Event e;
   bool quit = false;
   while (!quit) {
@@ -161,6 +165,12 @@ void Game::run() {
     for (int i = 0; i < 10; i++) {
       people[i]->travel();
     }
+    if (frameCount % 20 == 0) {
+      if (spawner.spawnObstacle(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT) != NULL) {
+        Mix_PlayChannel(-1, blockCreateSound, 0);
+      }
+    }
+    ++frameCount;
     draw();
     std::this_thread::sleep_for(std::chrono::milliseconds(17));
   }

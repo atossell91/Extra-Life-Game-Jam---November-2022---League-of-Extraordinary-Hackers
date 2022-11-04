@@ -47,3 +47,10 @@ void Obstacle::setY(int y) {
 void Obstacle::addFunc(std::function<void (GameRectangle*)> func) {
     area->addOverlapFunc(func);
 }
+
+bool Obstacle::isOverlap(const IOverlappable& other, bool) const {
+    return area->isOverlap(other, false);
+}
+bool Obstacle::isIntersect(const int x, const int y) const {
+    return area->isIntersect(x, y);
+}
