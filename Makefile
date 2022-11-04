@@ -18,7 +18,7 @@ SDL_INCLUDE = -ISDL/include/SDL2
 #SDL_FLAGS = -w -Wl,-subsystem,windows
 
 #  This is absolutely necessary!
-SDL_ARCHIVE = -lmingw32 -lSDL2main -lSDL2
+SDL_ARCHIVE = -lmingw32 -lSDL2main -lSDL2_ttf -lSDL2_mixer -lSDL2
 #SDL_ARCHIVE = -lmingw32 -Wl,-rpath,SDL/lib/SDL2main -Wl,-rpath,SDL/include/SDL2
 SDL = $(SDL_INCLUDE) $(SDL_FLAGS) $(SDL_ARCHIVE)
 ## End SDL Stuff ##

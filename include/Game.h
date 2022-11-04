@@ -2,6 +2,7 @@
 #define INCLUDE_GAME_H_
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <vector>
 #include <string>
 
@@ -13,6 +14,8 @@ class Game {
     SDL_Window* window = NULL;
     SDL_Surface* surface = NULL;
     SDL_Surface* bg_surface = NULL;
+    Mix_Music* mainTheme;
+
     std::vector<IDrawable*> drawables;
     std::vector<IOverlappable*> physicals;
     std::vector<IOverlappable*> nonPhysicals;
@@ -32,6 +35,9 @@ class Game {
 public:
     const int SCREEN_HEIGHT = 640;
     const int SCREEN_WIDTH = 960;
+
+    const int AUDIO_CHANNELS = 2;
+    const int AUDIO_CHUNK_SIZE = 2048;
 
     void start();
 };

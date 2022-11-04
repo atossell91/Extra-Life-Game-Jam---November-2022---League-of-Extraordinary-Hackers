@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 #include <vector>
 #include <iostream>
@@ -21,11 +22,15 @@ void Game::start() {
 
 void Game::init() {
     //  These should be in if statements (possibly nested)
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     window = SDL_CreateWindow("Boxes",SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED,SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_SHOWN);
     surface = SDL_GetWindowSurface(window);
     bg_surface = SDL_LoadBMP("assets/map/map.bmp");
+
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT,
+    AUDIO_CHANNELS, AUDIO_CHUNK_SIZE);
+    mainTheme = Mix_LoadMUS("assets/sounds/Extra Life Jam theme.wav");
 }
 
 void Game::draw() {
@@ -75,6 +80,8 @@ void Game::run() {
 
     r1->setNonPhysicalsList(&nonPhysicals);
 
+    Mix_PlayMusic(mainTheme, -1);
+
     SDL_Event e;
     bool quit = false;
     while (!quit) {
@@ -104,6 +111,8 @@ void Game::run() {
         draw();
         std::this_thread::sleep_for(std::chrono::milliseconds(17));
     }
+
+    Mix_HaltMusic();
 }
 
 void Game::close() {
