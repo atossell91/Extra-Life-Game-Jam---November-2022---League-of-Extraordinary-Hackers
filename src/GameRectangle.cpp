@@ -59,6 +59,7 @@ void GameRectangle::moveX(const int amt) {
     if (!isValidMove()) {
         xPos -= amt;
     }
+    SDL_PushEvent(&OverlapEvent);
 }
 
 void GameRectangle::moveY(const int amt) {
@@ -66,6 +67,7 @@ void GameRectangle::moveY(const int amt) {
     if (!isValidMove()) {
         yPos -= amt;
     }
+    SDL_PushEvent(&OverlapEvent);
 }
 
 void GameRectangle::setX(const int val) {

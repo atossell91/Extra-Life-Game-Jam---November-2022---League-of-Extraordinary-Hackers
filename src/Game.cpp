@@ -107,6 +107,9 @@ void Game::run() {
                     r1->moveX(amt);
                 }
             }
+            if (e.type == GameRectangle::OverlapEvent->type()) {
+                std::cout << "An Overlap ocurred" << std::endl;
+            }
         }
         draw();
         std::this_thread::sleep_for(std::chrono::milliseconds(17));
