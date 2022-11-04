@@ -10,7 +10,8 @@
 #include "IOverlappable.h"
 #include "IPlayerMoveable.h"
 
-class GameRectangle : public IDrawable, public IOverlappable, public IPlayerMoveable {
+class GameRectangle : public IDrawable, public IOverlappable,
+    public IPlayerMoveable {
  public:
    const int OVERLAP_AMT = 3;
    ~GameRectangle();
@@ -44,21 +45,23 @@ class GameRectangle : public IDrawable, public IOverlappable, public IPlayerMove
     int height = 50;
     int xPos = 0;
     int yPos = 0;
-
-    int currentFrame = 0;
-    int drawCounter =0;
-
+      
    std::vector<IOverlappable*>* physicals = NULL;
    std::vector<IOverlappable*>* nonPhysicals = NULL;
-   std::vector<std::function<void (GameRectangle*)>> overlapFuncs;
+   std::vector<std::function<void (GameRectangle*)>> overlapFuncs;\
+     
+  int currentFrame = 0;
+  int drawCounter = 0;\
 
-   SDL_Surface* img_surface = NULL;
-   std::vector<SDL_Surface*> sprites;
+  std::vector<IOverlappable*> *physicals = NULL;
+  std::vector<IOverlappable*> *nonPhysicals = NULL;
 
-    int red = 255;
-    int green = 0;
-    int blue = 0;
+  SDL_Surface *img_surface = NULL;
+  std::vector<SDL_Surface*> sprites;
 
+  int red = 255;
+  int green = 0;
+  int blue = 0;
 
 };
 

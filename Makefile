@@ -20,7 +20,14 @@ SDL_INCLUDE = -ISDL/include/SDL2
 #SDL_FLAGS = -w -Wl,-subsystem,windows
 
 #  This is absolutely necessary!
-SDL_ARCHIVE = -lmingw32 -lSDL2main -lSDL2_ttf -lSDL2_mixer -lSDL2
+# Fixed So I can Compile too you asshole - Liam
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	SDL_ARCHIVE = -lSDL2main -lSDL2_ttf -lSDL2_mixer -lSDL2
+else 
+	SDL_ARCHIVE = -lmingw32 -lSDL2main -lSDL2_ttf -lSDL2_mixer -lSDL2
+endif
+
 #SDL_ARCHIVE = -lmingw32 -Wl,-rpath,SDL/lib/SDL2main -Wl,-rpath,SDL/include/SDL2
 SDL = $(SDL_INCLUDE) $(SDL_FLAGS) $(SDL_ARCHIVE)
 ## End SDL Stuff ##
@@ -33,4 +40,4 @@ $(PROJECT_NAME): $(SRC)
 
 
 clean:
-	rm -f *.exe *.o src/*.o
+	rm -f *.exe *.o src/*.o $(PROJECT_NAME)

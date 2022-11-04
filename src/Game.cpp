@@ -6,13 +6,15 @@
 
 #include <vector>
 #include <iostream>
-#include <Algorithm>
+#include <algorithm>
 #include <thread>
 #include <chrono>
 
 #include "../include/IDrawable.h"
 #include "../include/IOverlappable.h"
 #include "../include/GameRectangle.h"
+#include "Player.h"
+#include "Person.h"
 
 template <typename T>
 void Game::eraseFromVector(std::vector<T>& vec, T elem) {
@@ -28,9 +30,9 @@ void Game::eraseFromVector(std::vector<T>& vec, T elem) {
 }
 
 void Game::start() {
-    init();
-    run();
-    close();
+  init();
+  run();
+  close();
 }
 
 void Game::init() {
@@ -48,122 +50,98 @@ void Game::init() {
 }
 
 void Game::draw() {
-    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format,125,125,125));
+  SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 125, 125, 125));
 
-    SDL_BlitSurface(bg_surface, NULL, surface, NULL);
+  SDL_BlitSurface(bg_surface, NULL, surface, NULL);
 
-    for (auto d : drawables) {
-        d->draw(surface);
-    }
-    SDL_UpdateWindowSurface(window);
+  for (auto d : drawables) {
+    d->draw(surface);
+  }
+  SDL_UpdateWindowSurface (window);
 }
 
 void Game::run() {
+  Player *player = new Player();
+  GameRectangle *r2 = new GameRectangle();
+  Person *people[10];
+  int tempH = 100;
+  int tempW = 100;
+  for (int i = 0; i < 10; i++) {
+    people[i] = new Person;
+    people[i]->setX(tempW);
+    people[i]->setY(tempH);
+    people[i]->setWidth(27);
+    people[i]->setHeight(30);
+    tempW += 50;
+    people[i]->loadSpriteFiles(
+        { "assets/person/person-small-0.bmp",
+            "assets/person/person-small-1.bmp",
+            "assets/person/person-small-2.bmp" });
+    drawables.push_back(static_cast<IDrawable*>(people[i]));
+    physicals.push_back(static_cast<IOverlappable*>(people[i]));
+  }
+  player->setWidth(27);
+  player->setHeight(30);
 
-    GameRectangle* playerObject = new GameRectangle();
-    playerObject->setWidth(27);
-    playerObject->setHeight(30);
-    playerObject->loadSpriteFiles({
-        "assets/person/person-small-0.bmp",
-        "assets/person/person-small-1.bmp",
-        "assets/person/person-small-2.bmp"
-    });
-    drawables.push_back(static_cast<IDrawable*>(playerObject));
-    physicals.push_back(static_cast<IOverlappable*>(playerObject));
-    nonPhysicals.push_back(static_cast<IOverlappable*>(playerObject));
-    playerObject->setPhysicalsList(&physicals);
-    //r2->setPhysicalsList(&physicals);
-    playerObject->setNonPhysicalsList(&nonPhysicals);
+  player->loadSpriteFiles( { "assets/person/person-small-0.bmp",
+      "assets/person/person-small-1.bmp", "assets/person/person-small-2.bmp" });
 
-    //  TODO: Handle the leaking memory
-    GameRectangle* bottomBox = new GameRectangle();
-    int bottomBoxHeight = 20;
-    bottomBox->setWidth(SCREEN_WIDTH);
-    bottomBox->setHeight(bottomBoxHeight);
-    bottomBox->setX(0);
-    bottomBox->setY(SCREEN_HEIGHT - bottomBoxHeight);
-    //TODO: Change this
-    //bottomBox->addOverlapFunc([this](GameRectangle* r){std::cout << "An overlap has occured" << std::endl;});
-    //drawables.push_back(static_cast<IDrawable*>(r3)); // Comment out to hide
-    nonPhysicals.push_back(static_cast<IOverlappable*>(bottomBox));
+  r2->setX(100);
+  r2->setY(100);
 
-    GameRectangle* blockObject1 = new GameRectangle();
-    blockObject1->setX(100);
-    blockObject1->setY(100);
-    blockObject1->setWidth(81);
-    blockObject1->setHeight(46);
-    blockObject1->loadSpriteFiles({
-        "assets/block/block-small-0.bmp",
-        "assets/block/block-small-1.bmp",
-    });
-    drawables.push_back(static_cast<IDrawable*>(blockObject1));
-    physicals.push_back(static_cast<IOverlappable*>(blockObject1));
+  r2->setWidth(81);
+  r2->setHeight(46);
+  r2->loadSpriteFiles( { "assets/block/block-small-0.bmp",
+      "assets/block/block-small-1.bmp", });
 
-    GameRectangle* qa = new GameRectangle();
-    int margin = 20;
-    qa->setWidth(81 + margin*2);
-    qa->setHeight(46 + margin*2);
-    qa->setX(250 - margin);
-    qa->setY(250 - margin);
-    nonPhysicals.push_back(static_cast<IOverlappable*>(qa));
-    drawables.push_back(static_cast<IDrawable*>(qa));
-    GameRectangle* destroyableBlock = new GameRectangle();
-    destroyableBlock->setWidth(81);
-    destroyableBlock->setHeight(46);
-    destroyableBlock->setX(250);
-    destroyableBlock->setY(250);
-    destroyableBlock->loadSpriteFiles({
-        "assets/block/block-small-0.bmp",
-        "assets/block/block-small-1.bmp",
-    });
-    qa->addOverlapFunc([this, qa, destroyableBlock](GameRectangle* r){
-        eraseFromVector(drawables, static_cast<IDrawable*>(qa));
-        eraseFromVector(nonPhysicals, static_cast<IOverlappable*>(qa));
-        eraseFromVector(drawables, static_cast<IDrawable*>(destroyableBlock));
-        eraseFromVector(physicals, static_cast<IOverlappable*>(destroyableBlock));
-        Mix_PlayChannel(-1, destroyBlock, 0);
-    });
-    drawables.push_back(destroyableBlock);
-    physicals.push_back(destroyableBlock);
+  drawables.push_back(static_cast<IDrawable*>(player));
+  drawables.push_back(static_cast<IDrawable*>(r2));
 
-    Mix_PlayMusic(mainTheme, -1);
+  physicals.push_back(static_cast<IOverlappable*>(player));
+  physicals.push_back(static_cast<IOverlappable*>(r2));
 
-    SDL_Event e;
-    bool quit = false;
-    while (!quit) {
+  nonPhysicals.push_back(static_cast<IOverlappable*>(player));
+
+  player->setPhysicalsList(&physicals);
+  //r2->setPhysicalsList(&physicals);
+
+  player->setNonPhysicalsList(&nonPhysicals);
+
+  for (int i = 0; i < 10; i++) {
+    people[i]->setPhysicalsList(&physicals);
+    people[i]->setNonPhysicalsList(&nonPhysicals);
+  }
+
+  Mix_PlayMusic(mainTheme, -1);
+  
+  SDL_Event e;
+  bool quit = false;
+  while (!quit) {
     int count = 0;
-        while (SDL_PollEvent(&e)) {
-            //  Event handlers go in here
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            }
-            if (e.type == SDL_KEYDOWN) {
-                int amt = 10;
-                const Uint8* state = SDL_GetKeyboardState(NULL);
-                if (state[SDL_SCANCODE_UP]) {
-                    playerObject->moveY(-amt);
-                }
-                if (state[SDL_SCANCODE_DOWN]) {
-                    playerObject->moveY(amt);
-                }
-                if (state[SDL_SCANCODE_LEFT]) {
-                    playerObject->moveX(-amt);
-                }
-                if (state[SDL_SCANCODE_RIGHT]) {
-                    playerObject->moveX(amt);
-                }
-            }
-        }
-        draw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(17));
+    while (SDL_PollEvent(&e)) {
+      //  Event handlers go in here
+      if (e.type == SDL_QUIT) {
+        quit = true;
+      }
+      if (e.type == SDL_KEYDOWN) {
+        int amt = 10;
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        player->travel(state);
+      }
     }
-
-    Mix_HaltMusic();
+    //Update NPCS
+    for (int i = 0; i < 10; i++) {
+      people[i]->travel();
+    }
+    draw();
+    std::this_thread::sleep_for(std::chrono::milliseconds(17));
+  }
+  Mix_HaltMusic();
 }
 
 void Game::close() {
-    SDL_FreeSurface(bg_surface);
-    bg_surface = NULL;
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+  SDL_FreeSurface (bg_surface);
+  bg_surface = NULL;
+  SDL_DestroyWindow (window);
+  SDL_Quit();
 }
