@@ -8,3 +8,5 @@ Built using SDL
 Game Font is,
     Control II by KineticPlasma Fonts
     URL: https://www.fontspace.com/connection-ii-font-f31971
+    
+Link to video: https://youtu.be/dCGElh06w_M
