@@ -15,7 +15,7 @@ class GameRectangle : public IDrawable, public IOverlappable,
  public:
    const int OVERLAP_AMT = 3;
    ~GameRectangle();
-    void draw(SDL_Surface* surface);
+    virtual void draw(SDL_Surface* surface);
     
     //  Move to collider/intersector
     bool isIntersect(const int x, const int y) const;
@@ -40,25 +40,30 @@ class GameRectangle : public IDrawable, public IOverlappable,
     void addOverlapFunc(std::function<void (GameRectangle*)> foo);
     void callOverlapFuncs();
     std::vector<IOverlappable*> findOverlaps();
+
+    public:
+  std::vector<IOverlappable*> *physicals = NULL;
+  std::vector<IOverlappable*> *nonPhysicals = NULL;
  private:
-    int width = 50;
-    int height = 50;
-    int xPos = 0;
-    int yPos = 0;
      
   int currentFrame = 0;
   int drawCounter = 0;
 
-  std::vector<IOverlappable*> *physicals = NULL;
-  std::vector<IOverlappable*> *nonPhysicals = NULL;
+  std::vector<IOverlappable*> triggeredObjs;
+
    std::vector<std::function<void (GameRectangle*)>> overlapFuncs;
 
   SDL_Surface *img_surface = NULL;
-  std::vector<SDL_Surface*> sprites;
 
   int red = 255;
   int green = 0;
   int blue = 0;
+  protected:
+    int width = 50;
+    int height = 50;
+    int xPos = 0;
+    int yPos = 0;
+  std::vector<SDL_Surface*> sprites;
 
 };
 

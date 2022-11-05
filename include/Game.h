@@ -9,6 +9,7 @@
 #include "IDrawable.h"
 #include "IOverlappable.h"
 #include "TextBox.h"
+#include "Person.h"
 #include "RandomNumGenerator.h"
 #include "ObstacleSpawner.h"
 
@@ -31,6 +32,7 @@ class Game {
     std::vector<IOverlappable*> physicals;
     std::vector<IOverlappable*> nonPhysicals;
     std::vector<IOverlappable*> playerNonPhysicals;
+    std::vector<Person*> people;
 
     const int SCORE_TB_WIDTH = 200;
     const int SCORE_TB_HEIGHT = 100;

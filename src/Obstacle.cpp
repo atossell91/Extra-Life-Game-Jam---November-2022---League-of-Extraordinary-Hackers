@@ -3,6 +3,7 @@
 #include "../include/VecRemover.h"
 
 #include <SDL2/SDL.h>
+#include <iostream>
 
 Obstacle::Obstacle(std::vector<IOverlappable*>* phys,
 std::vector<IOverlappable*>* nonPhys) {
@@ -13,6 +14,7 @@ std::vector<IOverlappable*>* nonPhys) {
         "assets/block/block-small-0.bmp",
       "assets/block/block-small-1.bmp"
     });
+    
     if (phys != NULL) {
         physicals = phys;
         phys->push_back(static_cast<IOverlappable*>(block));
@@ -21,13 +23,16 @@ std::vector<IOverlappable*>* nonPhys) {
     area = new GameRectangle();
     area->setWidth(BLOCK_WIDTH + MARGIN*2);
     area->setHeight(BLOCK_HEIGHT + MARGIN*2);
+    area->setColour(255, 0, 0);
     if (nonPhys != NULL) {
         nonPhysicals = nonPhys;
-        nonPhys->push_back(static_cast<IOverlappable*>(area));
+        IOverlappable* ptr = static_cast<IOverlappable*>(area);
+        nonPhysicals->push_back(ptr);
     }
 }
 
 void Obstacle::draw(SDL_Surface* surface) {
+    //area->draw(surface);
     block->draw(surface);
 }
 

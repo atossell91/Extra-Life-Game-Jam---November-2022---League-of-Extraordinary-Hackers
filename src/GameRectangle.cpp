@@ -2,6 +2,7 @@
 
 #include <functional>
 #include "../include/GameRectangle.h"
+#include "../include/VecRemover.h"
 #include <iostream>
 
 GameRectangle::~GameRectangle() {
@@ -12,7 +13,6 @@ GameRectangle::~GameRectangle() {
 }
 
 void GameRectangle::draw(SDL_Surface *surface) {
-
   SDL_Rect r;
   r.w = width;
   r.h = height;
@@ -22,7 +22,7 @@ void GameRectangle::draw(SDL_Surface *surface) {
   if (sprites.size() < 1) {
     SDL_FillRect(surface, &r, SDL_MapRGB(surface->format, red, green, blue));
   } else {
-    if (drawCounter >= 3) {
+    if (drawCounter >= sprites.size()) {
       drawCounter = 0;
       currentFrame = (currentFrame + 1) % sprites.size();
     }
@@ -35,7 +35,7 @@ bool GameRectangle::isValidMove() const {
   if (physicals == NULL) {
     return true;
   }
-  for (auto object : *physicals) {
+  for (IOverlappable* object : *physicals) {
     if (object == this) {
       continue;
     } else if (isOverlap(*object, true)) {
@@ -72,8 +72,15 @@ void GameRectangle::moveX(const int amt) {
     if (!isValidMove()) {
         xPos -= amt;
     }
-    for (auto overlap : findOverlaps()) {
-        overlap->callOverlapFuncs();
+    auto ov = findOverlaps();
+    for (auto overlap : ov) {
+        if (VecRemover::isInVector(triggeredObjs, overlap)) {
+          continue;
+        }
+        else {
+          overlap->callOverlapFuncs();
+          triggeredObjs.push_back(overlap);
+        }
     }
 }
 
@@ -82,8 +89,15 @@ void GameRectangle::moveY(const int amt) {
     if (!isValidMove()) {
         yPos -= amt;
     }
-    for (auto overlap : findOverlaps()) {
-        overlap->callOverlapFuncs();
+    auto ov = findOverlaps();
+    for (auto overlap : ov) {
+        if (VecRemover::isInVector(triggeredObjs, overlap)) {
+          continue;
+        }
+        else {
+          overlap->callOverlapFuncs();
+          triggeredObjs.push_back(overlap);
+        }
     }
 }
 
