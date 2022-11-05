@@ -1,4 +1,4 @@
-PROJECT_NAME = boxes
+PROJECT_NAME = blocked
 
 CXX = g++
 CXXFLAGS = -std=c++17
