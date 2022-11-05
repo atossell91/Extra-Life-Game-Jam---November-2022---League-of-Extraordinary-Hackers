@@ -8,16 +8,18 @@
 #ifndef INCLUDE_PERSON_H_
 #define INCLUDE_PERSON_H_
 #include "Characters.h"
+#include <vector>
 
 class Person : public Characters {
  public:
-  Person(int x, int y);
+  static const int WIDTH = 27;
+  static const int HEIGHT = 30;
+
+  Person(std::vector<IOverlappable*>* phys, std::vector<IOverlappable*>* nonPhys);
   void travel();
   void respawn();
  private:
   int score = 0;
-  const int spawnx;
-  const int spawny;
   int spawntimer = 0;
 };
 

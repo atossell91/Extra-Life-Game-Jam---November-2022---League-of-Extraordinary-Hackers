@@ -7,6 +7,7 @@
 #include "GameRectangle.h"
 #include "IDrawable.h"
 #include "IOverlappable.h"
+#include <iostream>
 
 class Obstacle : public IDrawable, public IOverlappable {
  private:

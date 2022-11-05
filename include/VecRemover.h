@@ -18,6 +18,16 @@ class VecRemover {
             vec.erase(i);
         }
     }
-};
 
+    template <typename T>
+    static bool isInVector(std::vector<T>& vec, T elem) {
+        for (auto e : vec) {
+            if (e == elem) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+};
 #endif  // INCLUDE_VECFINDER_H_

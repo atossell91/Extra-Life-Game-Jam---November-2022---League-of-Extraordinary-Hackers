@@ -14,6 +14,7 @@ class Characters : public GameRectangle {
  public:
   virtual void travel() = 0;
   void setSpeed(unsigned int spd);
+  //void draw(SDL_Surface* surface);
  protected:
   unsigned int speed = 1;
 };

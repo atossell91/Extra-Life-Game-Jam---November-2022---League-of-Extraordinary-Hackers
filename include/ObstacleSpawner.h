@@ -15,12 +15,13 @@ class ObstacleSpawner {
     std::vector<IDrawable*>* drawables;
     std::vector<IOverlappable*>* phsyicals;
     std::vector<IOverlappable*>* nonPhysicals;
-    RandomNumGenerator rGen;
+    RandomNumGenerator* rGen;
     
  public:
    ObstacleSpawner(std::vector<IOverlappable*>* physicals,
    std::vector<IOverlappable*>* nonPysicals,
-   std::vector<IDrawable*>* drawables);
+   std::vector<IDrawable*>* drawables,
+   RandomNumGenerator* rg);
    bool isCollision(IOverlappable* o);
     Obstacle* spawnObstacle(int xMin, int xMax, int yMin, int yMax);
 };

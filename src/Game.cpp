@@ -18,6 +18,7 @@
 #include "../include/VecRemover.h"
 #include "../include/TextBox.h"
 #include "../include/Person.h"
+#include "../include/PersonSpawner.h"
 #include "Obstacle.h"
 #include "Player.h"
 #include "Person.h"
@@ -82,70 +83,52 @@ void Game::run() {
     endBox->setHeight(ebHeight);
     endBox->setX(0);
     endBox->setY(SCREEN_HEIGHT - ebHeight);
-    nonPhysicals.push_back(static_cast<IOverlappable*>(endBox));
+    playerNonPhysicals.push_back(static_cast<IOverlappable*>(endBox));
     int score =0;
     endBox->addOverlapFunc([&score, this](GameRectangle* endBox)
     {
       this->updateScore(++score);
       Mix_PlayChannel(-1, this->freedomSound, 0);
     });
-  Player *player = new Player();
-  GameRectangle *r2 = new GameRectangle();
-  Person *people[10];
-  int tempH = 100;
-  int tempW = 100;
-  for (int i = 0; i < 10; i++) {
-    people[i] = new Person(tempW, tempH);
-    //people[i]->setX(tempW);
-    //people[i]->setY(tempH);
-    people[i]->setWidth(27);
-    people[i]->setHeight(30);
-    tempW += 50;
-    people[i]->loadSpriteFiles(
-        { "assets/person/person-small-0.bmp",
-            "assets/person/person-small-1.bmp",
-            "assets/person/person-small-2.bmp" });
-    drawables.push_back(static_cast<IDrawable*>(people[i]));
-    physicals.push_back(static_cast<IOverlappable*>(people[i]));
-    nonPhysicals.push_back(static_cast<IOverlappable*>(people[i]));
-  }
-  player->setWidth(27);
-  player->setHeight(30);
 
-  player->loadSpriteFiles( { "assets/person/person-small-0.bmp",
-      "assets/person/person-small-1.bmp", "assets/person/person-small-2.bmp" });
+  Player *player1 = new Player(&physicals, &nonPhysicals);
+  player1->playerNo = 1;
 
-  drawables.push_back(static_cast<IDrawable*>(player));
+  player1->loadSpriteFiles({
+    "assets/player/character-small-back-1.bmp",
+    "assets/player/character-small-front-1.bmp",
+    "assets/player/character-small-left-1.bmp",
+    "assets/player/character-small-right-1.bmp"
+    });
+  drawables.push_back(static_cast<IDrawable*>(player1));
 
-  physicals.push_back(static_cast<IOverlappable*>(player));
+  
+  Player *player2 = new Player(&physicals, &nonPhysicals);
+  player2->playerNo = 2;
+  player2->setX(50);
 
-  playerNonPhysicals.push_back(static_cast<IOverlappable*>(player));
+  player2->loadSpriteFiles({
+    "assets/player/character-small-back-2.bmp",
+    "assets/player/character-small-front-2.bmp",
+    "assets/player/character-small-left-2.bmp",
+    "assets/player/character-small-right-2.bmp"
+    });
+  drawables.push_back(static_cast<IDrawable*>(player2));
 
-  player->setPhysicalsList(&physicals);
-  player->setNonPhysicalsList(&playerNonPhysicals);
+  //Obstacle* temp = new Obstacle(&physicals, &nonPhysicals);
+  //temp->setX(90);
+  //temp->setY(50);
+  //drawables.push_back(temp);
 
-  Obstacle* o = new Obstacle(&physicals, &playerNonPhysicals);
-  o->setX(200);
-  o->setY(200);
-  o->addFunc([&o, this](GameRectangle* gr){
-    o->removeAll();
-    VecRemover::remove(drawables, static_cast<IDrawable*>(o));
-    Mix_PlayChannel(-1, destroyBlock, 0);
-  });
-  drawables.push_back(static_cast<IDrawable*>(o));
+  // TODO: Reanable
 
-  //player->setNonPhysicalsList(&nonPhysicals);
-
-  for (int i = 0; i < 10; i++) {
-    people[i]->setPhysicalsList(&physicals);
-    people[i]->setNonPhysicalsList(&nonPhysicals);
-  }
-
-  ObstacleSpawner spawner(&physicals, &nonPhysicals, &drawables);
+  ObstacleSpawner spawner(&physicals, &nonPhysicals, &drawables, &rGen);
+  PersonSpawner pSpawner(&physicals, &nonPhysicals, &playerNonPhysicals, &drawables, &rGen);
 
   Mix_PlayMusic(mainTheme, -1);
   
   unsigned int frameCount =0;
+  int personCount =0;
   SDL_Event e;
   bool quit = false;
   while (!quit) {
@@ -158,16 +141,28 @@ void Game::run() {
       if (e.type == SDL_KEYDOWN) {
         int amt = 10;
         const Uint8 *state = SDL_GetKeyboardState(NULL);
-        player->travel(state);
+        player1->travel(state);
+        player2->travel(state);
       }
     }
     //Update NPCS
-    for (int i = 0; i < 10; i++) {
-      people[i]->travel();
+    for (auto psn : people) {
+      psn->travel();
     }
-    if (frameCount % 20 == 0) {
-      if (spawner.spawnObstacle(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT) != NULL) {
-        Mix_PlayChannel(-1, blockCreateSound, 0);
+   if (frameCount % 300 == 0) {
+    auto ps = pSpawner.spawnPeople(5, 0, SCREEN_WIDTH);
+    people.insert(people.end(), ps.begin(), ps.end());
+    personCount += ps.size();
+   }
+    if (frameCount % 30 == 0) {
+      Obstacle* o;
+      if ((o = spawner.spawnObstacle(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)) != NULL) {
+        o->addFunc([this, o](GameRectangle*){
+          o->removeAll();
+          VecRemover::remove(drawables, static_cast<IDrawable*>(o));
+          Mix_PlayChannel(-1, destroyBlock, 0);
+        });
+       Mix_PlayChannel(-1, blockCreateSound, 0);
       }
     }
     ++frameCount;

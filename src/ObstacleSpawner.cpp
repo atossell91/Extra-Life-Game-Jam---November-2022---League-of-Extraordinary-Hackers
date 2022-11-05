@@ -6,11 +6,13 @@
 
 
 ObstacleSpawner::ObstacleSpawner(std::vector<IOverlappable*>* physicals,
-std::vector<IOverlappable*>* nonPysicals,
-std::vector<IDrawable*>* drawables) {
+std::vector<IOverlappable*>* nonPhysicals,
+std::vector<IDrawable*>* drawables,
+RandomNumGenerator* rg) {
     this->phsyicals = physicals;
     this->nonPhysicals = nonPhysicals;
     this->drawables = drawables;
+    this->rGen = rg;
 }
 
 bool ObstacleSpawner::isCollision(IOverlappable* o) {
@@ -32,15 +34,14 @@ Obstacle* ObstacleSpawner::spawnObstacle(int xMin, int xMax, int yMin, int yMax)
     int x =0;
     int y =0;
     do {
-        x = rGen.generate(xMin, xMax);
-        y = rGen.generate(yMin, yMax);
+        x = rGen->generate(xMin, xMax);
+        y = rGen->generate(yMin, yMax);
         r.setX(x);
         r.setY(y);
         ++count;
     } while (isCollision(&r) && count < maxTries);
 
     if (count == maxTries) {
-        std::cout << "Not placed" << std::endl;
         return NULL;
     }
     else {
